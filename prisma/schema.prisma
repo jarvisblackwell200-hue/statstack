@@ -1,0 +1,302 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Teams ───────────────────────────────────────────────────────────────────
+
+model Team {
+  id             Int               @id @default(autoincrement())
+  nhlId          Int               @unique
+  name           String            // e.g. "Maple Leafs"
+  abbreviation   String            @unique // e.g. "TOR"
+  fullName       String            // e.g. "Toronto Maple Leafs"
+  division       String            // e.g. "Atlantic"
+  conference     String            // e.g. "Eastern"
+  logoUrl        String?
+  primaryColor   String?           // hex e.g. "#003E7E"
+  secondaryColor String?
+  players        Player[]
+  seasonStats    TeamSeasonStats[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([division])
+  @@index([conference])
+}
+
+model TeamSeasonStats {
+  id                 Int    @id @default(autoincrement())
+  teamId             Int
+  team               Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  season             String // e.g. "20252026"
+  gameType           String @default("regular") // "regular" | "playoff"
+
+  // Record
+  gamesPlayed        Int     @default(0)
+  wins               Int     @default(0)
+  losses             Int     @default(0)
+  otLosses           Int     @default(0)
+  points             Int     @default(0)
+  pointsPct          Float?
+
+  // Scoring
+  goalsFor           Int     @default(0)
+  goalsAgainst       Int     @default(0)
+  goalDiff           Int     @default(0)
+
+  // Special Teams
+  ppPct              Float?
+  pkPct              Float?
+
+  // Shot metrics
+  shotsForPerGame    Float?
+  shotsAgainstPerGame Float?
+
+  // Other
+  faceoffPct         Float?
+
+  // Advanced
+  corsiForPct        Float?
+  xGoalsForPct       Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([teamId, season, gameType])
+  @@index([season])
+  @@index([points])
+  @@index([wins])
+}
+
+// ─── Players ─────────────────────────────────────────────────────────────────
+
+model Player {
+  id           Int     @id @default(autoincrement())
+  nhlId        Int     @unique
+  firstName    String
+  lastName     String
+  fullName     String
+  teamId       Int?
+  team         Team?   @relation(fields: [teamId], references: [id])
+  position     String  // "C", "LW", "RW", "D", "G"
+  shootsCatches String? // "L" or "R"
+  height       Int?    // inches
+  weight       Int?    // lbs
+  birthDate    DateTime?
+  birthCity    String?
+  birthCountry String?
+  draftYear    Int?
+  draftRound   Int?
+  draftPick    Int?
+  headshotUrl  String?
+  isActive     Boolean @default(true)
+
+  seasonStats  PlayerSeasonStats[]
+  gameLogs     PlayerGameLog[]
+  goalieStats  GoalieSeasonStats[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teamId])
+  @@index([position])
+  @@index([lastName])
+  @@index([isActive])
+}
+
+// ─── Skater Season Stats ─────────────────────────────────────────────────────
+
+model PlayerSeasonStats {
+  id               Int     @id @default(autoincrement())
+  playerId         Int
+  player           Player  @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  season           String  // e.g. "20252026"
+  gameType         String  @default("regular") // "regular" | "playoff"
+
+  // Standard
+  gamesPlayed      Int     @default(0)
+  goals            Int     @default(0)
+  assists          Int     @default(0)
+  points           Int     @default(0)
+  plusMinus         Int     @default(0)
+  pim              Int     @default(0) // penalty minutes
+
+  // Power Play / Shorthanded
+  ppGoals          Int     @default(0)
+  ppAssists        Int     @default(0)
+  ppPoints         Int     @default(0)
+  shGoals          Int     @default(0)
+  shAssists        Int     @default(0)
+  shPoints         Int     @default(0)
+
+  // Scoring Extras
+  gameWinningGoals Int     @default(0)
+  overtimeGoals    Int     @default(0)
+  firstGoals       Int     @default(0)
+
+  // Shooting
+  shots            Int     @default(0)
+  shootingPct      Float?
+  missedShots      Int     @default(0)
+
+  // Ice Time (stored in seconds for precision)
+  toi              Int     @default(0) // total TOI in seconds
+  toiPerGame       Float?              // avg TOI per game in seconds
+  evToi            Int     @default(0)
+  ppToi            Int     @default(0)
+  shToi            Int     @default(0)
+
+  // Physical
+  hits             Int     @default(0)
+  blocks           Int     @default(0)
+  takeaways        Int     @default(0)
+  giveaways        Int     @default(0)
+
+  // Faceoffs
+  faceoffPct       Float?
+  faceoffsWon      Int     @default(0)
+  faceoffsLost     Int     @default(0)
+
+  // ─── Advanced / Possession (5v5 unless noted) ──────────────────────────
+  corsiFor         Int?
+  corsiAgainst     Int?
+  corsiForPct      Float?  // CF%
+  corsiRelPct      Float?  // Relative CF%
+
+  fenwickFor       Int?
+  fenwickAgainst   Int?
+  fenwickForPct    Float?  // FF%
+
+  // Expected Goals
+  xGoalsFor        Float?
+  xGoalsAgainst    Float?
+  xGoalsForPct     Float?  // xGF%
+  xGoalsDiff       Float?  // xG+/-
+  individualXG     Float?  // ixG
+
+  // On-Ice / Quality
+  pdo              Float?
+  onIceShPct       Float?  // on-ice shooting %
+  onIceSvPct       Float?  // on-ice save %
+
+  // Zone Starts
+  ozStartPct       Float?
+  dzStartPct       Float?
+  nzStartPct       Float?
+
+  // High-Danger
+  hdCorsiForPct    Float?  // HDCF%
+  hdGoalsFor       Int?
+  hdGoalsAgainst   Int?
+
+  // On-Ice Rates (per 60 minutes)
+  goalsForPer60    Float?  // GF/60
+  goalsAgainstPer60 Float? // GA/60
+  corsiForPer60    Float?  // CF/60
+  corsiAgainstPer60 Float? // CA/60
+
+  // Value Metrics
+  offensiveGAR     Float?  // Offensive Goals Above Replacement
+  defensiveGAR     Float?  // Defensive Goals Above Replacement
+  gar              Float?  // Total GAR
+  war              Float?  // Wins Above Replacement
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([playerId, season, gameType])
+  @@index([season])
+  @@index([points])
+  @@index([goals])
+  @@index([assists])
+  @@index([gamesPlayed])
+  @@index([war])
+  @@index([corsiForPct])
+  @@index([xGoalsForPct])
+}
+
+// ─── Player Game Log ─────────────────────────────────────────────────────────
+
+model PlayerGameLog {
+  id         Int      @id @default(autoincrement())
+  playerId   Int
+  player     Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  gameId     Int      // NHL game ID
+  date       DateTime
+  opponent   String   // team abbreviation
+  homeAway   String   // "H" | "A"
+
+  goals      Int      @default(0)
+  assists    Int      @default(0)
+  points     Int      @default(0)
+  plusMinus   Int      @default(0)
+  shots      Int      @default(0)
+  toi        Int      @default(0) // seconds
+  hits       Int      @default(0)
+  blocks     Int      @default(0)
+  pim        Int      @default(0)
+  ppGoals    Int      @default(0)
+  shGoals    Int      @default(0)
+  faceoffPct Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([playerId, gameId])
+  @@index([gameId])
+  @@index([date])
+  @@index([playerId, date])
+}
+
+// ─── Goalie Season Stats ─────────────────────────────────────────────────────
+
+model GoalieSeasonStats {
+  id                     Int     @id @default(autoincrement())
+  playerId               Int
+  player                 Player  @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  season                 String  // e.g. "20252026"
+  gameType               String  @default("regular") // "regular" | "playoff"
+
+  // Record
+  gamesPlayed            Int     @default(0)
+  gamesStarted           Int     @default(0)
+  wins                   Int     @default(0)
+  losses                 Int     @default(0)
+  otLosses               Int     @default(0)
+
+  // Core
+  savePercentage         Float?
+  goalsAgainstAvg        Float?
+  shutouts               Int     @default(0)
+  saves                  Int     @default(0)
+  shotsAgainst           Int     @default(0)
+  goalsAgainst           Int     @default(0)
+  toi                    Int     @default(0) // seconds
+
+  // Advanced
+  qualityStarts          Int?
+  qualityStartsPct       Float?
+  goalsSavedAboveAverage Float? // GSAA
+  xGoalsAgainst          Float? // expected goals against
+  goalsPrevented         Float? // goals prevented / saved above expected
+
+  // Situational
+  evSavePercentage       Float?
+  ppSavePercentage       Float?
+  shSavePercentage       Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([playerId, season, gameType])
+  @@index([season])
+  @@index([savePercentage])
+  @@index([goalsAgainstAvg])
+  @@index([wins])
+}
