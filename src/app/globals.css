@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+:root {
+  /* Light theme */
+  --bg-primary: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-hover: #f0f0f5;
+  --bg-table-row-alt: #f5f5fa;
+  --text-primary: #1a1a2e;
+  --text-secondary: #555570;
+  --border: #e0e0e8;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+  --positive: #22c55e;
+  --negative: #ef4444;
+  --warning: #f59e0b;
+}
+
+.dark {
+  --bg-primary: #0f0f1a;
+  --bg-card: #1a1a2e;
+  --bg-hover: #252542;
+  --bg-table-row-alt: #151528;
+  --text-primary: #e8e8f0;
+  --text-secondary: #8888a0;
+  --border: #2a2a45;
+  --accent: #6366f1;
+  --accent-hover: #818cf8;
+  --positive: #22c55e;
+  --negative: #ef4444;
+  --warning: #f59e0b;
+}
+
+@theme inline {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-card: var(--bg-card);
+  --color-bg-hover: var(--bg-hover);
+  --color-bg-table-row-alt: var(--bg-table-row-alt);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-positive: var(--positive);
+  --color-negative: var(--negative);
+  --color-warning: var(--warning);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Table number cells use monospace */
+.font-tabular {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Stat cell gradient utilities */
+.stat-positive {
+  background: color-mix(in srgb, var(--positive) 15%, transparent);
+}
+.stat-negative {
+  background: color-mix(in srgb, var(--negative) 15%, transparent);
+}
+.stat-neutral {
+  background: color-mix(in srgb, var(--warning) 10%, transparent);
+}
+
+/* Scrollbar styling for dark mode */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.dark ::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
