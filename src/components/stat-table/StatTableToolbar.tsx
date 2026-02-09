@@ -39,6 +39,8 @@ export function StatTableToolbar<T>({
   const [showPresets, setShowPresets] = useState(false);
   const [showSaveView, setShowSaveView] = useState(false);
   const [copied, setCopied] = useState(false);
+  const controlClassName =
+    "min-h-11 w-full rounded-md border border-border bg-bg-card px-3 text-sm text-text-primary sm:w-auto";
 
   function applyPreset(preset: ColumnPreset) {
     const vis: VisibilityState = {};
@@ -69,11 +71,11 @@ export function StatTableToolbar<T>({
   }
 
   return (
-    <div className="mb-3 flex flex-wrap items-center gap-3">
+    <div className="mb-3 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center">
       {/* Position Filter */}
       {positions && (
         <select
-          className="rounded-md border border-border bg-bg-card px-3 py-1.5 text-sm text-text-primary"
+          className={`${controlClassName} py-2`}
           value={activePosition ?? ""}
           onChange={(e) => {
             const val = e.target.value;
@@ -91,7 +93,7 @@ export function StatTableToolbar<T>({
 
       {/* Team Filter */}
       <select
-        className="rounded-md border border-border bg-bg-card px-3 py-1.5 text-sm text-text-primary"
+        className={`${controlClassName} py-2`}
         value={activeTeam ?? ""}
         onChange={(e) => {
           const val = e.target.value;
@@ -107,11 +109,11 @@ export function StatTableToolbar<T>({
       </select>
 
       {/* Min GP Filter */}
-      <div className="flex items-center gap-1.5">
-        <label className="text-xs text-text-secondary">Min GP</label>
+      <div className="flex w-full items-center gap-2 sm:w-auto">
+        <label className="shrink-0 text-xs text-text-secondary">Min GP</label>
         <input
           type="number"
-          className="w-16 rounded-md border border-border bg-bg-card px-2 py-1.5 text-sm text-text-primary"
+          className="min-h-11 w-full rounded-md border border-border bg-bg-card px-3 text-sm text-text-primary sm:w-20"
           placeholder="0"
           min={0}
           value={activeMinGP ?? ""}
@@ -123,15 +125,15 @@ export function StatTableToolbar<T>({
       </div>
 
       {/* Column Visibility Toggle */}
-      <div className="relative">
+      <div className="relative w-full sm:w-auto">
         <button
-          className="rounded-md border border-border bg-bg-card px-3 py-1.5 text-sm text-text-primary hover:bg-bg-hover"
+          className={`${controlClassName} py-2 hover:bg-bg-hover`}
           onClick={() => setShowColumns(!showColumns)}
         >
           Columns
         </button>
         {showColumns && (
-          <div className="absolute top-full left-0 z-50 mt-1 w-56 rounded-md border border-border bg-bg-card p-2 shadow-lg">
+          <div className="absolute top-full left-0 z-50 mt-1 w-full max-w-[min(22rem,calc(100vw-2rem))] rounded-md border border-border bg-bg-card p-2 shadow-lg sm:w-56">
             {columnGroups.map((group) => {
               const groupCols = group.columns
                 .map((colId) => table.getColumn(colId))
@@ -143,7 +145,7 @@ export function StatTableToolbar<T>({
               return (
                 <label
                   key={group.id}
-                  className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-sm hover:bg-bg-hover"
+                  className="flex min-h-11 cursor-pointer items-center gap-2 rounded px-2 py-2 text-sm hover:bg-bg-hover"
                 >
                   <input
                     type="checkbox"
@@ -164,19 +166,19 @@ export function StatTableToolbar<T>({
       </div>
 
       {/* Presets Dropdown */}
-      <div className="relative">
+      <div className="relative w-full sm:w-auto">
         <button
-          className="rounded-md border border-border bg-bg-card px-3 py-1.5 text-sm text-text-primary hover:bg-bg-hover"
+          className={`${controlClassName} py-2 hover:bg-bg-hover`}
           onClick={() => setShowPresets(!showPresets)}
         >
           Presets
         </button>
         {showPresets && (
-          <div className="absolute top-full left-0 z-50 mt-1 w-40 rounded-md border border-border bg-bg-card p-1 shadow-lg">
+          <div className="absolute top-full left-0 z-50 mt-1 w-full max-w-[min(20rem,calc(100vw-2rem))] rounded-md border border-border bg-bg-card p-1 shadow-lg sm:w-40">
             {columnPresets.map((preset) => (
               <button
                 key={preset.id}
-                className="block w-full rounded px-3 py-1.5 text-left text-sm text-text-primary hover:bg-bg-hover"
+                className="block min-h-11 w-full rounded px-3 py-2 text-left text-sm text-text-primary hover:bg-bg-hover"
                 onClick={() => applyPreset(preset)}
               >
                 {preset.label}
@@ -188,22 +190,22 @@ export function StatTableToolbar<T>({
 
       {/* Share Button */}
       <button
-        className="rounded-md border border-border bg-bg-card px-3 py-1.5 text-sm text-text-primary hover:bg-bg-hover"
+        className={`${controlClassName} py-2 hover:bg-bg-hover`}
         onClick={handleShare}
       >
         {copied ? "Copied!" : "Share"}
       </button>
 
       {/* Save View Placeholder */}
-      <div className="relative">
+      <div className="relative w-full sm:w-auto">
         <button
-          className="rounded-md border border-border bg-bg-card px-3 py-1.5 text-sm text-text-primary hover:bg-bg-hover"
+          className={`${controlClassName} py-2 hover:bg-bg-hover`}
           onClick={() => setShowSaveView(!showSaveView)}
         >
           Save View
         </button>
         {showSaveView && (
-          <div className="absolute top-full left-0 z-50 mt-1 w-48 rounded-md border border-border bg-bg-card p-3 shadow-lg">
+          <div className="absolute top-full left-0 z-50 mt-1 w-full max-w-[min(20rem,calc(100vw-2rem))] rounded-md border border-border bg-bg-card p-3 shadow-lg sm:w-48">
             <p className="text-xs text-text-secondary">
               Sign in to save views
             </p>
@@ -212,7 +214,7 @@ export function StatTableToolbar<T>({
       </div>
 
       {/* Row count */}
-      <span className="ml-auto text-xs text-text-secondary">
+      <span className="text-xs text-text-secondary sm:ml-auto">
         {rowCount} player{rowCount !== 1 ? "s" : ""}
       </span>
     </div>
