@@ -6,7 +6,18 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
-  const url = process.env.DATABASE_URL!;
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    // Return a throwing proxy so callers can gracefully fallback in their own try/catch.
+    return new Proxy(
+      {},
+      {
+        get() {
+          throw new Error("DATABASE_URL is not configured");
+        },
+      },
+    ) as PrismaClient;
+  }
 
   // If the URL is a prisma+postgres:// Accelerate URL, decode the embedded
   // direct TCP connection string and use the pg adapter instead.

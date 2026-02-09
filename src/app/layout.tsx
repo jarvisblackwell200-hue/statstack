@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import "./globals.css";
 
@@ -31,37 +32,49 @@ export default function RootLayout({
       >
         <nav className="sticky top-0 z-50 border-b border-border bg-bg-card/80 backdrop-blur-md">
           <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
-            <a href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <span className="text-xl font-bold tracking-tight text-accent">
                 Stat
               </span>
               <span className="text-xl font-bold tracking-tight">Stack</span>
-            </a>
+            </Link>
             <div className="flex items-center gap-6 text-sm text-text-secondary">
-              <a
+              <Link
+                href="/dashboard"
+                className="transition-colors hover:text-text-primary"
+              >
+                Dashboard
+              </Link>
+              <Link
                 href="/nhl"
                 className="transition-colors hover:text-text-primary"
               >
                 NHL
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/nhl/players"
                 className="transition-colors hover:text-text-primary"
               >
                 Players
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/nhl/teams"
                 className="transition-colors hover:text-text-primary"
               >
                 Teams
-              </a>
-              <a
+              </Link>
+              <Link
+                href="/nhl/leaders"
+                className="transition-colors hover:text-text-primary"
+              >
+                Leaders
+              </Link>
+              <Link
                 href="/nhl/compare"
                 className="transition-colors hover:text-text-primary"
               >
                 Compare
-              </a>
+              </Link>
             </div>
           </div>
         </nav>

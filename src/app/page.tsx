@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   const statCategories = [
     {
@@ -32,18 +34,18 @@ export default function Home() {
           visualization. Starting with the NHL.
         </p>
         <div className="mt-10 flex gap-4">
-          <a
+          <Link
             href="/nhl/players"
             className="rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
           >
             Explore NHL Stats
-          </a>
-          <a
+          </Link>
+          <Link
             href="/nhl/compare"
             className="rounded-lg border border-border px-6 py-3 text-sm font-semibold transition-colors hover:bg-bg-hover"
           >
             Compare Players
-          </a>
+          </Link>
         </div>
       </section>
 
