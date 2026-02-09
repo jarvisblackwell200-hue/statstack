@@ -2,7 +2,7 @@
 
 import { flexRender, type Row, type Cell, type Table } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useRef } from "react";
+import { useRef, type CSSProperties } from "react";
 import { PlayerCell } from "./PlayerCell";
 import { StatCell } from "./StatCell";
 
@@ -11,6 +11,40 @@ interface StatTableBodyProps<T> {
   rows: Row<T>[];
   percentiles: Map<string, Map<number, number>>;
   playerNameColumn: string;
+}
+
+interface StatColumnMeta {
+  sticky?: boolean;
+  stickyLeft?: number;
+  numeric?: boolean;
+  colorScale?: boolean;
+}
+
+function getCellWidthStyles(
+  size: number,
+  minSize: number | undefined,
+  maxSize: number | undefined,
+  sticky: boolean,
+): CSSProperties {
+  if (sticky) {
+    return {
+      width: size,
+      minWidth: size,
+      maxWidth: size,
+    };
+  }
+
+  const minWidth = Math.min(
+    size,
+    Math.max(minSize ?? 0, size <= 55 ? 40 : size <= 70 ? 48 : 56),
+  );
+  const maxWidth = Math.min(maxSize ?? size, size);
+
+  return {
+    width: `clamp(${minWidth}px, calc(${(size / 14).toFixed(2)}vw + ${Math.round(size * 0.55)}px), ${maxWidth}px)`,
+    minWidth,
+    maxWidth,
+  };
 }
 
 export function StatTableBody<T>({
@@ -42,24 +76,22 @@ export function StatTableBody<T>({
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
-                const meta = header.column.columnDef.meta as
-                  | {
-                      sticky?: boolean;
-                      stickyLeft?: number;
-                      numeric?: boolean;
-                    }
-                  | undefined;
+                const meta = header.column.columnDef.meta as StatColumnMeta | undefined;
                 const isSorted = header.column.getIsSorted();
 
                 return (
                   <th
                     key={header.id}
-                    className={`whitespace-nowrap border-b border-border bg-bg-card px-2 py-2 text-xs font-semibold uppercase tracking-wide text-text-secondary select-none ${
+                    className={`whitespace-nowrap border-b border-border bg-bg-card px-1.5 py-2 text-xs font-semibold uppercase tracking-wide text-text-secondary select-none sm:px-2 ${
                       meta?.numeric ? "text-right" : "text-left"
                     } ${meta?.sticky ? "sticky z-30" : ""}`}
                     style={{
-                      width: header.getSize(),
-                      minWidth: header.getSize(),
+                      ...getCellWidthStyles(
+                        header.getSize(),
+                        header.column.columnDef.minSize,
+                        header.column.columnDef.maxSize,
+                        Boolean(meta?.sticky),
+                      ),
                       ...(meta?.sticky
                         ? { left: meta.stickyLeft ?? 0 }
                         : {}),
@@ -114,14 +146,7 @@ export function StatTableBody<T>({
                 }`}
               >
                 {row.getVisibleCells().map((cell: Cell<T, unknown>) => {
-                  const meta = cell.column.columnDef.meta as
-                    | {
-                        sticky?: boolean;
-                        stickyLeft?: number;
-                        numeric?: boolean;
-                        colorScale?: boolean;
-                      }
-                    | undefined;
+                  const meta = cell.column.columnDef.meta as StatColumnMeta | undefined;
 
                   const isPlayerCol = cell.column.id === playerNameColumn;
                   const rowData = row.original as Record<string, unknown>;
@@ -133,7 +158,7 @@ export function StatTableBody<T>({
                   return (
                     <td
                       key={cell.id}
-                      className={`whitespace-nowrap px-2 py-1 text-sm ${
+                      className={`whitespace-nowrap px-1.5 py-1 text-sm sm:px-2 ${
                         meta?.numeric ? "text-right font-tabular" : "text-left"
                       } ${
                         meta?.sticky
@@ -141,8 +166,12 @@ export function StatTableBody<T>({
                           : ""
                       }`}
                       style={{
-                        width: cell.column.getSize(),
-                        minWidth: cell.column.getSize(),
+                        ...getCellWidthStyles(
+                          cell.column.getSize(),
+                          cell.column.columnDef.minSize,
+                          cell.column.columnDef.maxSize,
+                          Boolean(meta?.sticky),
+                        ),
                         ...(meta?.sticky
                           ? { left: meta.stickyLeft ?? 0 }
                           : {}),
