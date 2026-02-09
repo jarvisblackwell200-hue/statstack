@@ -5,12 +5,30 @@ import { buildMockTeamProfile, mockTeamStats } from "@/lib/nhl/mock-teams";
 
 const CURRENT_SEASON = "20252026";
 
-async function withFallback<T>(query: () => Promise<T>, fallback: () => T): Promise<T> {
+export async function withFallback<T>(
+  query: () => Promise<T>,
+  fallback: () => T,
+  queryName: string,
+): Promise<T> {
   try {
     return await query();
   } catch (error) {
-    console.warn("[nhl/queries] fallback", error);
-    return fallback();
+    const isDevelopment = process.env.NODE_ENV === "development";
+
+    console.error("[nhl/queries] query_failed", {
+      queryName,
+      environment: process.env.NODE_ENV ?? "undefined",
+      fallbackUsed: isDevelopment,
+      errorName: error instanceof Error ? error.name : "UnknownError",
+      errorMessage: error instanceof Error ? error.message : String(error),
+      errorStack: error instanceof Error ? error.stack : undefined,
+    });
+
+    if (isDevelopment) {
+      return fallback();
+    }
+
+    throw error;
   }
 }
 
@@ -89,7 +107,7 @@ export async function getSkaterRows(
       xGoalsDiff: s.xGoalsDiff,
       war: s.war,
     }));
-  }, () => [...mockSkaterRows]);
+  }, () => [...mockSkaterRows], "getSkaterRows");
 }
 
 export async function getGoalieRows(
@@ -144,7 +162,7 @@ export async function getGoalieRows(
       ppSavePercentage: s.ppSavePercentage,
       shSavePercentage: s.shSavePercentage,
     }));
-  }, () => [...mockGoalieRows]);
+  }, () => [...mockGoalieRows], "getGoalieRows");
 }
 
 export interface PlayerCareerSeason {
@@ -407,7 +425,7 @@ export async function getPlayerProfile(
         toi: log.toi,
       })),
     };
-  }, () => buildMockProfile(playerId));
+  }, () => buildMockProfile(playerId), "getPlayerProfile");
 }
 
 export interface TeamStatsRow {
@@ -488,7 +506,7 @@ export async function getTeamStatsRows(
       corsiForPct: row.corsiForPct ?? 0,
       xGoalsForPct: row.xGoalsForPct ?? 0,
     }));
-  }, () => [...mockTeamStats].sort((a, b) => b.points - a.points));
+  }, () => [...mockTeamStats].sort((a, b) => b.points - a.points), "getTeamStatsRows");
 }
 
 export async function getTeamProfile(
@@ -575,5 +593,5 @@ export async function getTeamProfile(
   }, () => {
     const mock = buildMockTeamProfile(abbreviation);
     return { team: mock.team, roster: mock.roster, lineCombos: mock.lines, trends: mock.trends };
-  });
+  }, "getTeamProfile");
 }
