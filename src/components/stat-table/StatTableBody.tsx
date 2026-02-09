@@ -31,8 +31,11 @@ export function StatTableBody<T>({
   return (
     <div
       ref={parentRef}
-      className="overflow-auto"
-      style={{ height: "calc(100vh - 280px)" }}
+      className="overflow-auto min-h-48"
+      style={{
+        height: "calc(100vh - 280px)",
+        maxHeight: "calc(100dvh - 280px)",
+      }}
     >
       <table className="w-max min-w-full border-collapse">
         <thead className="sticky top-0 z-20">
