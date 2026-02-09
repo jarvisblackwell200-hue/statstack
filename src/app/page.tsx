@@ -1,6 +1,12 @@
 import Link from "next/link";
+import { getSkaterRows } from "@/lib/nhl/queries";
 
-export default function Home() {
+export default async function Home() {
+  const skaters = await getSkaterRows();
+  const scoringLeaders = [...skaters]
+    .sort((a, b) => b.points - a.points)
+    .slice(0, 10);
+
   const statCategories = [
     {
       title: "200+ Stats",
@@ -21,9 +27,60 @@ export default function Home() {
   ];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-16">
-      {/* Hero */}
-      <section className="flex flex-col items-center text-center">
+    <div className="mx-auto max-w-7xl px-4 py-8">
+      {/* Real stats above the fold */}
+      <section>
+        <div className="rounded-lg border border-border bg-bg-card p-8">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold">NHL Scoring Leaders</h2>
+            <Link
+              href="/nhl/leaders"
+              className="text-sm font-medium text-accent transition-colors hover:text-accent-hover"
+            >
+              View all leaderboards
+            </Link>
+          </div>
+          <div className="mt-6 overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-border text-text-secondary">
+                  <th className="pb-3 pr-4 font-medium">Player</th>
+                  <th className="pb-3 pr-4 font-medium">Team</th>
+                  <th className="pb-3 pr-4 text-right font-medium">GP</th>
+                  <th className="pb-3 pr-4 text-right font-medium">G</th>
+                  <th className="pb-3 pr-4 text-right font-medium">A</th>
+                  <th className="pb-3 pr-4 text-right font-medium">P</th>
+                  <th className="pb-3 text-right font-medium">+/-</th>
+                </tr>
+              </thead>
+              <tbody className="font-tabular">
+                {scoringLeaders.map((row) => (
+                  <tr
+                    key={row.id}
+                    className="border-b border-border/50 transition-colors hover:bg-bg-hover"
+                  >
+                    <td className="py-3 pr-4 font-medium">{row.fullName}</td>
+                    <td className="py-3 pr-4 text-text-secondary">{row.teamAbbreviation}</td>
+                    <td className="py-3 pr-4 text-right">{row.gamesPlayed}</td>
+                    <td className="py-3 pr-4 text-right">{row.goals}</td>
+                    <td className="py-3 pr-4 text-right">{row.assists}</td>
+                    <td className="py-3 pr-4 text-right font-semibold">{row.points}</td>
+                    <td className="py-3 text-right">{row.plusMinus}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {scoringLeaders.length === 0 ? (
+            <p className="mt-4 text-center text-sm text-text-secondary">
+              No skater stats available yet.
+            </p>
+          ) : null}
+        </div>
+      </section>
+
+      {/* Marketing content below stats */}
+      <section className="mt-16 flex flex-col items-center text-center">
         <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
           Deep Sports Analytics
           <br />
@@ -49,8 +106,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Feature cards */}
-      <section className="mt-24 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {statCategories.map((cat) => (
           <div
             key={cat.title}
@@ -62,56 +118,6 @@ export default function Home() {
             </p>
           </div>
         ))}
-      </section>
-
-      {/* Placeholder stat preview */}
-      <section className="mt-24">
-        <div className="rounded-lg border border-border bg-bg-card p-8">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">NHL Scoring Leaders</h2>
-            <span className="text-sm text-text-secondary">2025\u201326 Season</span>
-          </div>
-          <div className="mt-6 overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-border text-text-secondary">
-                  <th className="pb-3 pr-4 font-medium">Player</th>
-                  <th className="pb-3 pr-4 font-medium">Team</th>
-                  <th className="pb-3 pr-4 text-right font-medium">GP</th>
-                  <th className="pb-3 pr-4 text-right font-medium">G</th>
-                  <th className="pb-3 pr-4 text-right font-medium">A</th>
-                  <th className="pb-3 pr-4 text-right font-medium">P</th>
-                  <th className="pb-3 text-right font-medium">+/-</th>
-                </tr>
-              </thead>
-              <tbody className="font-tabular">
-                {[
-                  { name: "Loading...", team: "---", gp: "--", g: "--", a: "--", p: "--", pm: "--" },
-                  { name: "Loading...", team: "---", gp: "--", g: "--", a: "--", p: "--", pm: "--" },
-                  { name: "Loading...", team: "---", gp: "--", g: "--", a: "--", p: "--", pm: "--" },
-                  { name: "Loading...", team: "---", gp: "--", g: "--", a: "--", p: "--", pm: "--" },
-                  { name: "Loading...", team: "---", gp: "--", g: "--", a: "--", p: "--", pm: "--" },
-                ].map((row, i) => (
-                  <tr
-                    key={i}
-                    className="border-b border-border/50 transition-colors hover:bg-bg-hover"
-                  >
-                    <td className="py-3 pr-4 font-medium">{row.name}</td>
-                    <td className="py-3 pr-4 text-text-secondary">{row.team}</td>
-                    <td className="py-3 pr-4 text-right">{row.gp}</td>
-                    <td className="py-3 pr-4 text-right">{row.g}</td>
-                    <td className="py-3 pr-4 text-right">{row.a}</td>
-                    <td className="py-3 pr-4 text-right font-semibold">{row.p}</td>
-                    <td className="py-3 text-right">{row.pm}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-4 text-center text-sm text-text-secondary">
-            Live data coming soon &mdash; connect the NHL API to see real stats
-          </p>
-        </div>
       </section>
     </div>
   );
