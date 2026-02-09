@@ -37,7 +37,7 @@ export function FilterSummary({
   if (!hasFilters) return null;
 
   return (
-    <div className="mb-3 flex flex-wrap items-center gap-2">
+    <div className="mb-3 flex w-full flex-wrap items-center gap-2">
       {pos && (
         <Chip label={`Position: ${pos}`} onClear={onClearPos} />
       )}
@@ -60,11 +60,13 @@ export function FilterSummary({
 
 function Chip({ label, onClear }: { label: string; onClear: () => void }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-bg-hover px-2.5 py-0.5 text-xs text-text-primary">
-      {label}
+    <span className="inline-flex min-w-0 max-w-full items-center gap-1 rounded-full bg-bg-hover px-2.5 py-0.5 text-xs text-text-primary">
+      <span className="truncate" title={label}>
+        {label}
+      </span>
       <button
         onClick={onClear}
-        className="ml-0.5 text-text-secondary hover:text-text-primary"
+        className="ml-0.5 shrink-0 text-text-secondary hover:text-text-primary"
         aria-label={`Clear ${label}`}
       >
         &times;
