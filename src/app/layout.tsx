@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import MainNav from "@/components/MainNav";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -38,44 +39,7 @@ export default function RootLayout({
               </span>
               <span className="text-xl font-bold tracking-tight">Stack</span>
             </Link>
-            <div className="flex items-center gap-6 text-sm text-text-secondary">
-              <Link
-                href="/dashboard"
-                className="transition-colors hover:text-text-primary"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/nhl"
-                className="transition-colors hover:text-text-primary"
-              >
-                NHL
-              </Link>
-              <Link
-                href="/nhl/players"
-                className="transition-colors hover:text-text-primary"
-              >
-                Players
-              </Link>
-              <Link
-                href="/nhl/teams"
-                className="transition-colors hover:text-text-primary"
-              >
-                Teams
-              </Link>
-              <Link
-                href="/nhl/leaders"
-                className="transition-colors hover:text-text-primary"
-              >
-                Leaders
-              </Link>
-              <Link
-                href="/nhl/compare"
-                className="transition-colors hover:text-text-primary"
-              >
-                Compare
-              </Link>
-            </div>
+            <MainNav />
           </div>
         </nav>
         <main>
